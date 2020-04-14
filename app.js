@@ -26,7 +26,7 @@ var budgetController = (function () {
     data.totals[type] = sum;
   }
 
-  
+
   var data = {
     allItems: {
       exp: [],
@@ -75,13 +75,13 @@ var budgetController = (function () {
 
       // calculate the percentage of income that is spent
       if (data.totals.inc > 0) {
-      data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+        data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
       } else {
         data.percentage = -1;   // use -1 to signify no percentage exists yet
       }
     },
 
-    getBudget: function() {
+    getBudget: function () {
       return {
         budget: data.budget,
         totalIncome: data.totals.inc,
@@ -108,8 +108,20 @@ var UIController = (function () {
     inputValue: '.add__value',
     inputBtn: '.add__btn',
     incomeContainer: '.income__list',
-    expensesContainer: '.expenses__list'
+    expensesContainer: '.expenses__list',
+    budgetLabel: '.budget__value',
+    incomeLabel: '.budget__income--value',
+    expensesLabel: '.budget__expenses--value',
+    percentageLabel: '.budget__expenses--percentage'
   };
+
+  // add function to format numbers to money for better look in UI
+  function formatMoney(number) {
+    return number.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+
+  //console.log(formatMoney(10000));   // $10,000.00
+  //console.log(formatMoney(1000000)); // $1,000,000.00
 
   return {
     getInput: function () {
@@ -134,7 +146,7 @@ var UIController = (function () {
       // replace the placeholder text with actual data
       newHtml = html.replace('%id%', obj.id);
       newHtml = newHtml.replace('%description%', obj.description);
-      newHtml = newHtml.replace('%value%', obj.value);
+      newHtml = newHtml.replace('%value%', formatMoney(obj.value));
 
       // insert the HTML into the DOM
 
@@ -156,7 +168,18 @@ var UIController = (function () {
       fieldsArr[0].focus();
 
     },
+    displayBudget: function (budgetDetails) {
+      document.querySelector(DOMstrings.budgetLabel).textContent = formatMoney(budgetDetails.budget);
+      document.querySelector(DOMstrings.incomeLabel).textContent = formatMoney(budgetDetails.totalIncome);
+      document.querySelector(DOMstrings.expensesLabel).textContent = formatMoney(budgetDetails.totalExpenses);
+    
 
+      if (budgetDetails.percentage > 0){
+        document.querySelector(DOMstrings.percentageLabel).textContent = budgetDetails.percentage + '%';
+      } else {
+        document.querySelector(DOMstrings.percentageLabel).textContent = '---';
+      }
+    },
     getDOMstrings: function () {
       return DOMstrings;
     }
@@ -198,7 +221,7 @@ var controller = (function (budgetCtrl, UICtrl) {
     var budget = budgetCtrl.getBudget();
 
     // populate the budget items on the UI
-    console.log(budget);
+    UICtrl.displayBudget(budget);
 
 
   };
@@ -229,6 +252,12 @@ var controller = (function (budgetCtrl, UICtrl) {
     init: function () {
       console.log('Application innitialization in progress');
       setupEventListers();
+      UICtrl.displayBudget({
+        budget: 0,
+        totalIncome: 0,
+        totalExpenses: 0,
+        percentage: -1
+      });
     }
   };
 })(budgetController, UIController);
