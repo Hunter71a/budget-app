@@ -158,7 +158,8 @@ var UIController = (function () {
     expensesLabel: '.budget__expenses--value',
     percentageLabel: '.budget__expenses--percentage',
     container: '.container',
-    expensesPercLabel: '.item__percentage'
+    expensesPercLabel: '.item__percentage',
+    dateLabel: '.budget__title--month',
   };
 
   // add function to format numbers to money for better look in UI
@@ -277,7 +278,17 @@ var UIController = (function () {
       });
     },
 
+    displayDate: function () {
+      var now, year, month;
+        var now = new Date();
+        // var christmas = new Date(2016, 11, 25);
 
+        year = now.getFullYear();
+
+        document.querySelector(DOMstrings.dateLabel).textContent = year;
+
+
+    },
 
     getDOMstrings: function () {
       return DOMstrings;
@@ -387,6 +398,7 @@ var controller = (function (budgetCtrl, UICtrl) {
     init: function () {
       console.log('Application innitialization in progress');
       setupEventListers();
+      UICtrl.displayDate();
       UICtrl.displayBudget({
         budget: 0,
         totalIncome: 0,
